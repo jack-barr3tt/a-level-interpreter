@@ -20,7 +20,7 @@ private:
   std::string value;
 
 public:
-    Token(Type type, double value);
+    Token(Type type, std::string value);
 
     std::string text();
 

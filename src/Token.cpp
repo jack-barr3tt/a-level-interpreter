@@ -1,6 +1,8 @@
 #include "Token.h"
 
-Token::Token(Token::Type type, double value) {
+#include <string>
+
+Token::Token(Token::Type type, std::string value) {
     this->type = type;
     this->value = value;
 }
@@ -13,6 +15,12 @@ std::string Token::text() {
       return "number";
     case Token::PLUS:
       return "+";
+    case Token::MINUS:
+      return "-";
+    case Token::MULTIPLY:
+      return "*";
+    case Token::DIVIDE:
+      return "/";
     case Token::OUTPUT:
       return "OUTPUT";
   }
@@ -23,7 +31,7 @@ std::string Token::pattern() {
     case Token::COMMENT:
       return "#.+\\b";
     case Token::NUMBER:
-      return "\\d\\b";
+      return "\\d+\\b";
     case Token::PLUS:
       return "\\+";
     case Token::MINUS:
