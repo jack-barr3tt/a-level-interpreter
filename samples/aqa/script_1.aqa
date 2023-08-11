@@ -1,6 +1,6 @@
-a <- 6
-b <- 4
-OUTPUT a + b
-OUTPUT a - b
-OUTPUT a * b
-OUTPUT a / b
+# Basic math and I/O
+OUTPUT 1
+OUTPUT 1 + 2
+OUTPUT 3 * 7
+OUTPUT 54 / 9
+OUTPUT 9 - 5
