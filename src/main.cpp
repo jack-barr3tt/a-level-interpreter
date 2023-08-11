@@ -2,6 +2,7 @@
 #include <regex>
 #include "Reader.h"
 #include "Token.h"
+#include "Lexer.h"
 
 using namespace std;
 
@@ -18,37 +19,13 @@ int main(int argc, char *argv[])
 
   cout << inputString << endl;
 
-  string pattern = "(";
+  cout << Lexer::generatePattern() << endl;
 
-  for(int i = 0; i < Token::Type::Count; i++) {
-    Token temp((Token::Type)i, 0);
-    pattern += temp.pattern();
-    if(i != Token::Type::Count - 1) {
-      pattern += ")|(";
-    }
-  }
-  pattern += ")";
+  vector<Token> tokens = Lexer::tokenize(inputString);
 
-  cout << pattern << endl;
-
-  std::regex regexObj(pattern);
-
-  std::smatch match;
-
-  while (std::regex_search(inputString, match, regexObj)) {
-    if(match.empty()) continue;
-    string matchString = match[0];
-
-    for(int i = 0; i < Token::Type::Count; i++) {
-      Token temp((Token::Type)i, 0);
-      if(std::regex_match(matchString, std::regex(temp.pattern()))) {
-        cout << temp.text() << endl;
-        break;
-      }
-    }
-
-
-    inputString = match.suffix();
+  for (Token token : tokens)
+  {
+    cout << token.getType() << " : " << token.getValue() << endl;
   }
 
 }
