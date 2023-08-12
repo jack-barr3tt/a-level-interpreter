@@ -28,7 +28,10 @@ struct Data {
 class Memory {
 public:
   void add(std::string identifier, int value, bool constant = false);
+  void add(std::string identifier, std::string value, bool constant = false);
   int getInt(std::string identifier);
+  std::string getString(std::string identifier);
+  DataType getType(std::string identifier);
 private:
   std::unordered_map<std::string, int> identifiers;
   std::unordered_map<int, Data> data;

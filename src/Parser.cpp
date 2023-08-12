@@ -74,10 +74,12 @@ std::shared_ptr<Statement> Parser::parseOutput() {
 }
 
 std::shared_ptr<Expression> Parser::parseExpression() {
-  Token lhsToken = expect(Token::Type::NUMBER, Token::Type::IDENTIFIER);
+  Token lhsToken = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::IDENTIFIER);
   std::shared_ptr<Expression> lhs;
   if(lhsToken.getType() == Token::Type::NUMBER) {
     lhs = std::make_shared<Expression>(std::stoi(lhsToken.getValue()));
+  }else if(lhsToken.getType() == Token::Type::STRING) {
+    lhs = std::make_shared<Expression>(lhsToken.getValue());
   }else {
     lhs = std::make_shared<Expression>(memory, lhsToken.getValue());
   }

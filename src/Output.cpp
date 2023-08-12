@@ -12,7 +12,12 @@ Output::Output(int outputInt) {
 
 void Output::execute() {
   if(this->outputExpression) {
-    std::cout << this->outputExpression->evaluate() << std::endl;
+    if(this->outputExpression->isString()) {
+      std::cout << this->outputExpression->evaluateString() << std::endl;
+
+    } else {
+      std::cout << this->outputExpression->evaluateInt() << std::endl;
+    }
     return;
   }
   std::cout << outputString << std::endl;

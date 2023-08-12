@@ -1,10 +1,18 @@
 #include "Token.h"
 
 #include <string>
+#include <regex>
 
 Token::Token(Token::Type type, std::string value) {
     this->type = type;
-    this->value = value;
+    if(type == Token::STRING) {
+      std::regex pattern("\"([^\"]*)\"");
+      std::smatch matches;
+      std::regex_search(value, matches, pattern);
+      this->value = matches[1];
+    }else{
+      this->value = value;
+    }
 }
 
 std::string Token::text() {
@@ -13,6 +21,8 @@ std::string Token::text() {
       return "comment";
     case Token::NUMBER:
       return "number";
+    case Token::STRING:
+      return "string";
     case Token::PLUS:
       return "+";
     case Token::MINUS:
@@ -42,6 +52,8 @@ std::string Token::pattern() {
       return "#.+\\b";
     case Token::NUMBER:
       return "\\d+\\b";
+    case Token::STRING:
+      return "\".+\"";
     case Token::PLUS:
       return "\\+";
     case Token::MINUS:

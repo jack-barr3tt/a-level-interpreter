@@ -1,0 +1,4 @@
+# Add strings
+a <- "Hello"
+b <- "World"
+OUTPUT a + b

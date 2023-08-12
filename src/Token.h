@@ -4,6 +4,10 @@
 
 class Token {
 public:
+  /*
+   * Types are ordered by precedence
+   * E.g OUTPUT could be matched as an IDENTIFIER, but it should be matched as OUTPUT
+   */
   enum Type {
     COMMENT,
     NUMBER,
@@ -15,6 +19,7 @@ public:
     ASSIGNMENT,
     END_OF_BLOCK,
     END_OF_LINE,
+    STRING,
     IDENTIFIER,
     Count
   };
