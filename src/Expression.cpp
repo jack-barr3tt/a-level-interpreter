@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-Expression::Expression(std::string value) {
+Expression::Expression(int value) {
   this->type = ExpressionType::NUMBER;
-  this->value = std::stoi(value);
+  this->value = value;
   this->left = nullptr;
   this->right = nullptr;
 }
@@ -30,6 +30,8 @@ int Expression::evaluate() {
   switch (this->type) {
     case Expression::ExpressionType::NUMBER:
       return this->value;
+    case Expression::ExpressionType::IDENTIFIER:
+      return this->memory->getInt(this->identifier);
     case Expression::ExpressionType::ADDITION:
       return this->left->evaluate() + this->right->evaluate();
     case Expression::ExpressionType::SUBTRACTION:
@@ -41,4 +43,12 @@ int Expression::evaluate() {
   }
 
   return 123;
+}
+
+Expression::Expression(std::shared_ptr<Memory> memory, std::string identifier) {
+  this->type = ExpressionType::IDENTIFIER;
+  this->memory = memory;
+  this->identifier = identifier;
+  this->left = nullptr;
+  this->right = nullptr;
 }

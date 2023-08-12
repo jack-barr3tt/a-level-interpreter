@@ -1,10 +1,10 @@
-#include <iostream>
-#include <regex>
 #include "Reader.h"
 #include "Token.h"
 #include "Lexer.h"
 #include "Block.h"
 #include "Parser.h"
+#include "Memory.h"
+#include <iostream>
 
 using namespace std;
 
@@ -21,7 +21,9 @@ int main(int argc, char *argv[])
 
   vector<Token> tokens = Lexer::tokenize(inputString);
 
-  Block block = Parser::parse(tokens);
+  auto memory = make_shared<Memory>();
+
+  Block block = Parser::parse(tokens, memory);
 
   block.execute();
 }

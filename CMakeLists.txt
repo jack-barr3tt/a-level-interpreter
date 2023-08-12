@@ -3,6 +3,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(ALevelInterpreter)
 
+set(CMAKE_CXX_STANDARD 17)
+
 add_executable(ALevelInterpreter src/main.cpp
         src/Reader.cpp
         src/Token.cpp
@@ -22,5 +24,9 @@ add_executable(ALevelInterpreter src/main.cpp
         src/EmptyStatement.h
         src/Expression.cpp
         src/Expression.h
+        src/Memory.cpp
+        src/Memory.h
+        src/Assignment.cpp
+        src/Assignment.h
 
 )

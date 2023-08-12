@@ -27,6 +27,10 @@ std::string Token::text() {
       return "end of line";
     case END_OF_BLOCK:
       return "end of block";
+    case Token::IDENTIFIER:
+      return "identifier";
+    case ASSIGNMENT:
+      return "assignment";
     case Count:
       break;
   }
@@ -48,6 +52,10 @@ std::string Token::pattern() {
       return "/";
     case Token::OUTPUT:
       return "OUTPUT\\b";
+    case Token::ASSIGNMENT:
+      return "<-";
+    case Token::IDENTIFIER:
+      return "[a-zA-Z]+\\b";
     case Token::END_OF_LINE:
       return "\\n";
     case END_OF_BLOCK:

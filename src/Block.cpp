@@ -1,7 +1,8 @@
 #include "Block.h"
 
-Block::Block(const std::vector<std::shared_ptr<Statement> > &statements) {
+Block::Block(std::shared_ptr<Memory> memory, const std::vector<std::shared_ptr<Statement> > &statements) {
   this->statements = statements;
+  this->memory = memory;
 }
 
 void Block::execute() {
