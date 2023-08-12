@@ -12,6 +12,8 @@ public:
     MULTIPLY,
     DIVIDE,
     OUTPUT,
+    END_OF_BLOCK,
+    END_OF_LINE,
     Count
   };
 

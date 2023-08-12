@@ -23,6 +23,12 @@ std::string Token::text() {
       return "/";
     case Token::OUTPUT:
       return "OUTPUT";
+    case Token::END_OF_LINE:
+      return "end of line";
+    case END_OF_BLOCK:
+      return "end of block";
+    case Count:
+      break;
   }
 }
 
@@ -42,6 +48,11 @@ std::string Token::pattern() {
       return "/";
     case Token::OUTPUT:
       return "OUTPUT\\b";
+    case Token::END_OF_LINE:
+      return "\\n";
+    case END_OF_BLOCK:
+      // Temporary since we don't have blocks yet
+      return "END_OF_BLOCK\\b";
     case Count:
       break;
   }

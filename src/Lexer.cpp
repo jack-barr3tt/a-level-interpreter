@@ -42,5 +42,8 @@ std::vector<Token> Lexer::tokenize(std::string inputString) {
     inputString = match.suffix();
   }
 
+  Token end(Token::Type::END_OF_BLOCK, "");
+  tokens.push_back(end);
+
   return tokens;
 }
