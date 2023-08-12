@@ -3,6 +3,8 @@
 #include "Reader.h"
 #include "Token.h"
 #include "Lexer.h"
+#include "Block.h"
+#include "Parser.h"
 
 using namespace std;
 
@@ -17,15 +19,9 @@ int main(int argc, char *argv[])
 
   string inputString = reader.read();
 
-  cout << inputString << endl;
-
-  cout << Lexer::generatePattern() << endl;
-
   vector<Token> tokens = Lexer::tokenize(inputString);
 
-  for (Token token : tokens)
-  {
-    cout << token.getType() << " : " << token.getValue() << endl;
-  }
+  Block block = Parser::parse(tokens);
 
+  block.execute();
 }
