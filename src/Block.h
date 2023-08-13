@@ -1,9 +1,12 @@
 #pragma once
 
 #include <vector>
-#include "Statement.h"
+#include "Statements/Statement.h"
 #include "Memory.h"
 
+/*
+ * Blocks are a container of multiple statements
+ */
 class Block {
 private:
   std::vector<std::shared_ptr<Statement> > statements;

@@ -15,18 +15,18 @@ add_executable(ALevelInterpreter src/main.cpp
         src/Parser.h
         src/Block.cpp
         src/Block.h
-        src/Statement.h
-        src/Output.cpp
-        src/Output.h
-        src/Statement.cpp
-        src/Statement.h
-        src/EmptyStatement.cpp
-        src/EmptyStatement.h
+        src/Statements/Statement.h
+        src/Statements/Output.cpp
+        src/Statements/Output.h
+        src/Statements/Statement.cpp
+        src/Statements/Statement.h
+        src/Statements/EmptyStatement.cpp
+        src/Statements/EmptyStatement.h
         src/Expression.cpp
         src/Expression.h
         src/Memory.cpp
         src/Memory.h
-        src/Assignment.cpp
-        src/Assignment.h
+        src/Statements/Assignment.cpp
+        src/Statements/Assignment.h
 
 )

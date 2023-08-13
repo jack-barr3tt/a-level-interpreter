@@ -1,11 +1,11 @@
 #include "Parser.h"
-#include "Output.h"
-#include "EmptyStatement.h"
-#include "Assignment.h"
+#include "Statements/Output.h"
+#include "Statements/EmptyStatement.h"
+#include "Statements/Assignment.h"
 
 #include <memory>
 
-Block Parser::parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
+std::shared_ptr<Block> Parser::parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
   Parser parser(tokens, memory);
   return parser.parseBlock();
 }
@@ -36,12 +36,7 @@ Token Parser::expect(Token::Type type, Args... args) {
   return expect(args...);
 }
 
-Block Parser::parseBlock() {
-  Block block(memory, parseStatements());
-  return block;
-}
-
-std::vector<std::shared_ptr<Statement> > Parser::parseStatements() {
+std::shared_ptr<Block> Parser::parseBlock() {
   std::vector<std::shared_ptr<Statement> > statements;
 
   while(peek().getType() != Token::Type::END_OF_BLOCK) {
@@ -50,7 +45,8 @@ std::vector<std::shared_ptr<Statement> > Parser::parseStatements() {
       statements.push_back(statement);
   }
 
-  return statements;
+  auto block = std::make_shared<Block>(memory, statements);
+  return block;
 }
 
 std::shared_ptr<Statement> Parser::parseStatement() {

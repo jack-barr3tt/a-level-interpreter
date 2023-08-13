@@ -15,37 +15,6 @@ Token::Token(Token::Type type, std::string value) {
     }
 }
 
-std::string Token::text() {
-  switch (this->type) {
-    case Token::COMMENT:
-      return "comment";
-    case Token::NUMBER:
-      return "number";
-    case Token::STRING:
-      return "string";
-    case Token::PLUS:
-      return "+";
-    case Token::MINUS:
-      return "-";
-    case Token::MULTIPLY:
-      return "*";
-    case Token::DIVIDE:
-      return "/";
-    case Token::OUTPUT:
-      return "OUTPUT";
-    case Token::END_OF_LINE:
-      return "end of line";
-    case END_OF_BLOCK:
-      return "end of block";
-    case Token::IDENTIFIER:
-      return "identifier";
-    case ASSIGNMENT:
-      return "assignment";
-    case Count:
-      break;
-  }
-}
-
 std::string Token::pattern() {
   switch (this->type) {
     case Token::COMMENT:

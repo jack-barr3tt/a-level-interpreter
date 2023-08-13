@@ -2,8 +2,8 @@
 
 
 #include "Statement.h"
-#include "Memory.h"
-#include "Expression.h"
+#include "../Memory.h"
+#include "../Expression.h"
 
 class Assignment: public Statement {
 private:
