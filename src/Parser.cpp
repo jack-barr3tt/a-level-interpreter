@@ -45,7 +45,9 @@ std::vector<std::shared_ptr<Statement> > Parser::parseStatements() {
   std::vector<std::shared_ptr<Statement> > statements;
 
   while(peek().getType() != Token::Type::END_OF_BLOCK) {
-    statements.push_back(parseStatement());
+    auto statement = parseStatement();
+    if(!dynamic_cast<EmptyStatement*>(statement.get()))
+      statements.push_back(statement);
   }
 
   return statements;
