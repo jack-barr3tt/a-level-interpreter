@@ -1,6 +1,8 @@
 #include "Memory.h"
 
-void Memory::add(std::string identifier, int value, bool constant) {
+#include <utility>
+
+void Memory::add(const std::string& identifier, int value, bool constant) {
   int key = getKey(identifier);
 
   Data data(INT, constant, {value});
@@ -8,7 +10,7 @@ void Memory::add(std::string identifier, int value, bool constant) {
   this->data[key] = data;
 }
 
-int Memory::getKey(std::string identifier) {
+int Memory::getKey(const std::string& identifier) {
   if(identifiers.find(identifier) == identifiers.end()) {
     int key = identifiers.size();
     identifiers[identifier] = key;
@@ -18,7 +20,7 @@ int Memory::getKey(std::string identifier) {
   }
 }
 
-int Memory::getInt(std::string identifier) {
+int Memory::getInt(const std::string& identifier) {
   int key = getKey(identifier);
 
   Data data = this->data[key];
@@ -30,7 +32,7 @@ int Memory::getInt(std::string identifier) {
   return data.data[0];
 }
 
-std::string Memory::getString(std::string identifier) {
+std::string Memory::getString(const std::string& identifier) {
   int key = getKey(identifier);
 
   Data data = this->data[key];
@@ -39,28 +41,28 @@ std::string Memory::getString(std::string identifier) {
     throw std::runtime_error("Type mismatch");
   }
 
-  std::string result = "";
+  std::string result;
 
-  for(int i = 0; i < data.data.size(); i++) {
-    result += (char)data.data[i];
+  for(int i : data.data) {
+    result += (char)i;
   }
 
   return result;
 }
 
-void Memory::add(std::string identifier, std::string value, bool constant) {
+void Memory::add(const std::string& identifier, std::string value, bool constant) {
   int key = getKey(identifier);
 
   Data data(STRING, constant, {});
 
-  for(int i = 0; i < value.size(); i++) {
-    data.data.push_back(value[i]);
+  for(char i : value) {
+    data.data.push_back(i);
   }
 
   this->data[key] = data;
 }
 
-DataType Memory::getType(std::string identifier) {
+DataType Memory::getType(const std::string& identifier) {
   int key = getKey(identifier);
 
   return this->data[key].type;

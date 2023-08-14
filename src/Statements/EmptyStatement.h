@@ -8,5 +8,5 @@
  */
 class EmptyStatement: public Statement {
 public:
-  void execute();
+  void execute() override;
 };

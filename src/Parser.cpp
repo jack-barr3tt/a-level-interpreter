@@ -4,15 +4,16 @@
 #include "Statements/Assignment.h"
 
 #include <memory>
+#include <utility>
 
 std::shared_ptr<Block> Parser::parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
-  Parser parser(tokens, memory);
+  Parser parser(std::move(tokens), std::move(memory));
   return parser.parseBlock();
 }
 
 Parser::Parser(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
-  this->tokens = tokens;
-  this->memory = memory;
+  this->tokens = std::move(tokens);
+  this->memory = std::move(memory);
 }
 
 Token Parser::peek() {
@@ -101,7 +102,7 @@ std::shared_ptr<Statement> Parser::parseAssignment(Token token) {
 std::shared_ptr<Statement> Parser::parseIdentifier(Token token) {
   switch(peek().getType()) {
     case Token::Type::ASSIGNMENT:
-      return parseAssignment(token);
+      return parseAssignment(std::move(token));
     default:
       throw std::runtime_error("Unexpected identifier");
   }

@@ -36,11 +36,11 @@ public:
   /*
    * Create an expression from a number
    */
-  Expression(int value);
+  explicit Expression(int value);
   /*
    * Create an expression from a string
    */
-  Expression(std::string value);
+  explicit Expression(std::string value);
   /*
    * Create an expression from an identifier
    */

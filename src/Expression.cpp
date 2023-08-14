@@ -1,6 +1,7 @@
 #include "Expression.h"
 
 #include <iostream>
+#include <utility>
 
 Expression::Expression(int value) {
   this->type = ExpressionType::NUMBER;
@@ -10,8 +11,8 @@ Expression::Expression(int value) {
 }
 
 Expression::Expression(const std::string& op, std::shared_ptr<Expression> left, std::shared_ptr<Expression> right) {
-  this->left = left;
-  this->right = right;
+  this->left = std::move(left);
+  this->right = std::move(right);
 
   if(op == "+") {
     this->type = ExpressionType::ADDITION;
@@ -28,19 +29,19 @@ Expression::Expression(const std::string& op, std::shared_ptr<Expression> left, 
 
 std::string Expression::evaluateString() {
   switch (this->type) {
-    case Expression::ExpressionType::NUMBER:
+    case ExpressionType::NUMBER:
       return std::to_string(this->value);
-    case Expression::ExpressionType::STRING:
+    case ExpressionType::STRING:
       return this->stringValue;
-    case Expression::ExpressionType::IDENTIFIER:
+    case ExpressionType::IDENTIFIER:
       return this->memory->getString(this->identifier);
-    case Expression::ExpressionType::ADDITION:
+    case ExpressionType::ADDITION:
       return this->left->evaluateString() + this->right->evaluateString();
-    case Expression::ExpressionType::SUBTRACTION:
+    case ExpressionType::SUBTRACTION:
       throw std::runtime_error("Wrong evaluation type");
-    case Expression::ExpressionType::MULTIPLICATION:
+    case ExpressionType::MULTIPLICATION:
       throw std::runtime_error("Wrong evaluation type");
-    case Expression::ExpressionType::DIVISION:
+    case ExpressionType::DIVISION:
       throw std::runtime_error("Wrong evaluation type");
   }
 
@@ -49,19 +50,19 @@ std::string Expression::evaluateString() {
 
 int Expression::evaluateInt() {
   switch (this->type) {
-    case Expression::ExpressionType::NUMBER:
+    case ExpressionType::NUMBER:
       return this->value;
-    case Expression::ExpressionType::STRING:
+    case ExpressionType::STRING:
       throw std::runtime_error("Wrong evaluation type");
-    case Expression::ExpressionType::IDENTIFIER:
+    case ExpressionType::IDENTIFIER:
       return this->memory->getInt(this->identifier);
-    case Expression::ExpressionType::ADDITION:
+    case ExpressionType::ADDITION:
       return this->left->evaluateInt() + this->right->evaluateInt();
-    case Expression::ExpressionType::SUBTRACTION:
+    case ExpressionType::SUBTRACTION:
       return this->left->evaluateInt() - this->right->evaluateInt();
-    case Expression::ExpressionType::MULTIPLICATION:
+    case ExpressionType::MULTIPLICATION:
       return this->left->evaluateInt() * this->right->evaluateInt();
-    case Expression::ExpressionType::DIVISION:
+    case ExpressionType::DIVISION:
       return this->left->evaluateInt() / this->right->evaluateInt();
     default:
       throw std::runtime_error("Unhandled expression type");
@@ -70,15 +71,15 @@ int Expression::evaluateInt() {
 
 Expression::Expression(std::shared_ptr<Memory> memory, std::string identifier) {
   this->type = ExpressionType::IDENTIFIER;
-  this->memory = memory;
-  this->identifier = identifier;
+  this->memory = std::move(memory);
+  this->identifier = std::move(identifier);
   this->left = nullptr;
   this->right = nullptr;
 }
 
 Expression::Expression(std::string value) {
   this->type = ExpressionType::STRING;
-  this->stringValue = value;
+  this->stringValue = std::move(value);
   this->left = nullptr;
   this->right = nullptr;
 }

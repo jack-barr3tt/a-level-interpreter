@@ -1,9 +1,10 @@
 #include "Output.h"
 
 #include <iostream>
+#include <utility>
 
 Output::Output(std::string outputString) {
-  this->outputString = outputString;
+  this->outputString = std::move(outputString);
 }
 
 Output::Output(int outputInt) {
@@ -24,5 +25,5 @@ void Output::execute() {
 }
 
 Output::Output(std::shared_ptr<Expression> outputExpression) {
-  this->outputExpression = outputExpression;
+  this->outputExpression = std::move(outputExpression);
 }

@@ -40,7 +40,7 @@ private:
    * If this overload is called, the expected token has not been found
    * and an error is thrown
    */
-  Token expect();
+  static Token expect();
   template<typename... Args>
   /*
    * Get the next token provided it matches one of the expected types

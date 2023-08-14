@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <utility>
 
 enum DataType {
   INT,
@@ -21,7 +22,7 @@ struct Data {
   bool constant;
   std::vector<int> data;
 
-  Data(DataType type, bool constant, std::vector<int> data) : type(type), constant(constant), data(data) {}
+  Data(DataType type, bool constant, std::vector<int> data) : type(type), constant(constant), data(std::move(data)) {}
 };
 
 /*
@@ -33,23 +34,23 @@ public:
   /*
    * Adds an integer value to the memory
    */
-  void add(std::string identifier, int value, bool constant = false);
+  void add(const std::string& identifier, int value, bool constant = false);
   /*
    * Adds a string value to the memory
    */
-  void add(std::string identifier, std::string value, bool constant = false);
+  void add(const std::string& identifier, std::string value, bool constant = false);
   /*
    * Gets an integer value from the memory
    */
-  int getInt(std::string identifier);
+  int getInt(const std::string& identifier);
   /*
    * Gets a string value from the memory
    */
-  std::string getString(std::string identifier);
+  std::string getString(const std::string& identifier);
   /*
    * Gets the type of a value from the memory
    */
-  DataType getType(std::string identifier);
+  DataType getType(const std::string& identifier);
 private:
   std::unordered_map<std::string, int> identifiers;
   std::unordered_map<int, Data> data;
@@ -57,5 +58,5 @@ private:
   /*
    * Gets the key associated with an identifier
    */
-  int getKey(std::string identifier);
+  int getKey(const std::string& identifier);
 };

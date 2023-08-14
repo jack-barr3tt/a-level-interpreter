@@ -18,14 +18,14 @@ public:
   /*
    * Output a string value
    */
-  Output(std::string outputString);
+  explicit Output(std::string outputString);
   /*
    * Output an integer value
    */
-  Output(int outputInt);
+  explicit Output(int outputInt);
   /*
    * Output the result of an expression
    */
-  Output(std::shared_ptr<Expression> outputExpression);
-  void execute();
+  explicit Output(std::shared_ptr<Expression> outputExpression);
+  void execute() override;
 };
