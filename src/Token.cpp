@@ -22,7 +22,7 @@ std::string Token::pattern() {
     case Token::NUMBER:
       return "\\d+\\b";
     case Token::STRING:
-      return "\".+\"";
+      return "\"([^\"]*)\"";
     case Token::PLUS:
       return "\\+";
     case Token::MINUS:

@@ -51,6 +51,7 @@ public:
    * Gets the type of a value from the memory
    */
   DataType getType(const std::string& identifier);
+
 private:
   std::unordered_map<std::string, int> identifiers;
   std::unordered_map<int, Data> data;
