@@ -2,111 +2,96 @@
 
 #include <string>
 #include <utility>
+#include <queue>
 #include "Memory.h"
+#include "Token.h"
 
 template <typename T>
 class Expression {
-public:
-  enum ExpressionType {
-    NUMBER,
-    STRING,
-    IDENTIFIER,
-    ADDITION,
-    SUBTRACTION,
-    MULTIPLICATION,
-    DIVISION
-  };
 private:
-  ExpressionType type;
-  T value;
-  std::optional<std::string> identifier;
-  std::optional<std::shared_ptr<Memory> > memory;
-  /*
-   * Left hand side of the expression
-   */
-  std::shared_ptr<Expression> left;
-  /*
-   * Right hand side of the expression
-   */
-  std::shared_ptr<Expression> right;
+  std::shared_ptr<std::queue<Token>> tokens;
+  std::shared_ptr<Memory> memory;
 public:
-  Expression(T value);
-  Expression(std::shared_ptr<Memory> memory, std::string identifier);
-  Expression(const std::string& op, std::shared_ptr<Expression> left, std::shared_ptr<Expression> right);
-
+  Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory);
   T evaluate();
 };
 
 template<typename T>
-inline Expression<T>::Expression(T _value) {
-  throw std::runtime_error("Invalid type");
-}
-
-template<> inline Expression<int>::Expression(int value) {
-  this->type = ExpressionType::NUMBER;
-  this->value = value;
-}
-
-template<> inline Expression<std::string>::Expression(std::string value) {
-  this->type = ExpressionType::STRING;
-  this->value = std::move(value);
+Expression<T>::Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory) {
+  this->tokens = tokens;
+  this->memory = memory;
 }
 
 template<typename T>
-inline Expression<T>::Expression(std::shared_ptr<Memory> memory, std::string identifier) {
-  this->type = ExpressionType::IDENTIFIER;
-  this->memory = std::move(memory);
-  this->identifier = std::move(identifier);
+T Expression<T>::evaluate() {
+  throw std::runtime_error("Unexpected type");
 }
 
-template<typename T>
-inline Expression<T>::Expression(const std::string& op, std::shared_ptr<Expression> left, std::shared_ptr<Expression> right) {
-  this->left = std::move(left);
-  this->right = std::move(right);
+template<> int Expression<int>::evaluate() {
+  stack<int> values;
 
-  if(op == "+") {
-    this->type = ExpressionType::ADDITION;
-  } else if(op == "-") {
-    this->type = ExpressionType::SUBTRACTION;
-  } else if(op == "*") {
-    this->type = ExpressionType::MULTIPLICATION;
-  } else if(op == "/") {
-    this->type = ExpressionType::DIVISION;
-  } else {
-    throw std::runtime_error("Invalid operator");
+  while(!tokens->empty()) {
+    Token token = tokens->front();
+    tokens->pop();
+
+    if (token.getType() == Token::Type::NUMBER) {
+      values.push(stoi(token.getValue()));
+    } else if (token.getType() == Token::Type::IDENTIFIER) {
+      values.push(memory->getInt(token.getValue()));
+    } else {
+      int rhs = values.top();
+      values.pop();
+      int lhs = values.top();
+      values.pop();
+
+      switch (token.getType()) {
+        case Token::Type::PLUS:
+          values.push(lhs + rhs);
+          break;
+        case Token::Type::MINUS:
+          values.push(lhs - rhs);
+          break;
+        case Token::Type::MULTIPLY:
+          values.push(lhs * rhs);
+          break;
+        case Token::Type::DIVIDE:
+          values.push(lhs / rhs);
+          break;
+        default:
+          throw std::runtime_error("Unexpected token");
+      }
+    }
   }
+
+  return values.top();
 }
 
-template<> inline int Expression<int>::evaluate() {
-  switch (this->type) {
-    case ExpressionType::NUMBER:
-      return this->value;
-    case ExpressionType::IDENTIFIER:
-      if(!this->memory.has_value()) throw std::runtime_error("Memory not set");
-      return this->memory->get()->getInt(this->identifier.value());
-    case ExpressionType::ADDITION:
-      return this->left->evaluate() + this->right->evaluate();
-    case ExpressionType::SUBTRACTION:
-      return this->left->evaluate() - this->right->evaluate();
-    case ExpressionType::MULTIPLICATION:
-      return this->left->evaluate() * this->right->evaluate();
-    case ExpressionType::DIVISION:
-      return this->left->evaluate() / this->right->evaluate();
-    default:
-      throw std::runtime_error("Unhandled expression type");
-  }
-}
+template<> std::string Expression<std::string>::evaluate() {
+  stack<std::string> values;
 
-template<> inline std::string Expression<std::string>::evaluate() {
-  switch (this->type) {
-    case ExpressionType::STRING:
-      return this->value;
-    case ExpressionType::IDENTIFIER:
-      if(!this->memory.has_value()) throw std::runtime_error("Memory not set");
-      return this->memory->get()->getString(this->identifier.value());
-    case ExpressionType::ADDITION:
-      return this->left->evaluate() + this->right->evaluate();
-    default:
-      throw std::runtime_error("Wrong evaluation type");
+  while(!tokens->empty()) {
+    Token token = tokens->front();
+    tokens->pop();
+
+    if (token.getType() == Token::Type::STRING) {
+      values.push(token.getValue());
+    } else if (token.getType() == Token::Type::IDENTIFIER) {
+      values.push(memory->getString(token.getValue()));
+    } else {
+      std::string rhs = values.top();
+      values.pop();
+      std::string lhs = values.top();
+      values.pop();
+
+      switch (token.getType()) {
+        case Token::Type::PLUS:
+          values.push(lhs + rhs);
+          break;
+        default:
+          throw std::runtime_error("Unexpected token");
+      }
+    }
   }
+
+  return values.top();
 }

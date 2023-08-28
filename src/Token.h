@@ -19,6 +19,8 @@ public:
     MINUS,
     MULTIPLY,
     DIVIDE,
+    R_PAREN,
+    L_PAREN,
     OUTPUT,
     ASSIGNMENT,
     END_OF_BLOCK,

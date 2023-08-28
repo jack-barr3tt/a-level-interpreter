@@ -18,7 +18,7 @@ Token::Token(Token::Type type, std::string value) {
 std::string Token::pattern() {
   switch (this->type) {
     case Token::COMMENT:
-      return "#.+\\b";
+      return "^#.*";
     case Token::NUMBER:
       return "\\d+\\b";
     case Token::STRING:
@@ -31,6 +31,10 @@ std::string Token::pattern() {
       return "\\*";
     case Token::DIVIDE:
       return "/";
+    case Token::R_PAREN:
+      return "\\)";
+    case Token::L_PAREN:
+      return "\\(";
     case Token::OUTPUT:
       return "OUTPUT\\b";
     case Token::ASSIGNMENT:
@@ -42,8 +46,6 @@ std::string Token::pattern() {
     case END_OF_BLOCK:
       // Temporary since we don't have blocks yet
       return "END_OF_BLOCK\\b";
-    case Count:
-      break;
   }
 }
 

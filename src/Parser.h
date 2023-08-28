@@ -2,6 +2,9 @@
 
 #include <utility>
 #include <vector>
+#include <queue>
+#include <stack>
+#include <iostream>
 #include "Token.h"
 #include "Block.h"
 #include "Expression.h"
@@ -88,47 +91,43 @@ public:
   static std::shared_ptr<Block> parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory);
 };
 
+template<typename T> std::shared_ptr<Expression<T> > Parser::parseExpression() {
+  index--;
+  if(peek().getType() != Token::Type::L_PAREN) index++;
 
-template<typename T>
-std::shared_ptr<Expression<T> > Parser::parseExpression() {
-  throw std::runtime_error("Invalid type");
-}
+  Token current = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::IDENTIFIER, Token::Type::L_PAREN);
+  std::stack<Token> operators;
+  std::shared_ptr<std::queue<Token> > output = std::make_shared<std::queue<Token>>();
 
-template<> inline std::shared_ptr<Expression<int> > Parser::parseExpression() {
-  Token lhsToken = expect(Token::Type::NUMBER, Token::Type::IDENTIFIER);
-  std::shared_ptr<Expression<int> > lhs;
-  if(lhsToken.getType() == Token::Type::NUMBER) {
-    lhs = std::make_shared<Expression<int> >(std::stoi(lhsToken.getValue()));
-  }else{
-    lhs = std::make_shared<Expression<int> >(memory, lhsToken.getValue());
+  while (current.getType() != Token::Type::END_OF_LINE) {
+    if (current.getType() == Token::Type::NUMBER || current.getType() == Token::Type::STRING || current.getType() == Token::Type::IDENTIFIER) {
+      output->push(current);
+    } else if(current.getType() == Token::Type::L_PAREN) {
+      operators.push(current);
+    } else if(current.getType() == Token::Type::R_PAREN) {
+      while(!operators.empty() && operators.top().getType() != Token::Type::L_PAREN) {
+        output->push(operators.top());
+        operators.pop();
+      }
+      operators.pop();
+    } else {
+      while(!operators.empty() && current.getType() <= operators.top().getType() && operators.top().getType() != Token::Type::L_PAREN) {
+        output->push(operators.top());
+        operators.pop();
+      }
+      operators.push(current);
+    }
+    current = next();
   }
 
-  if(peek().getType() == Token::Type::END_OF_LINE) {
-    return lhs;
+  while(!operators.empty()) {
+    output->push(operators.top());
+    operators.pop();
   }
 
-  std::string op = next().getValue();
-  auto rhs = parseExpression<int>();
-  auto expression = std::make_shared<Expression<int> >(op, lhs, rhs);
-  return expression;
-}
+  index--;
 
-template<> inline std::shared_ptr<Expression<std::string> > Parser::parseExpression() {
-  Token lhsToken = expect(Token::Type::STRING, Token::Type::IDENTIFIER);
-  std::shared_ptr<Expression<std::string> > lhs;
-  if(lhsToken.getType() == Token::Type::STRING) {
-    lhs = std::make_shared<Expression<std::string> >(lhsToken.getValue());
-  }else{
-    lhs = std::make_shared<Expression<std::string> >(memory, lhsToken.getValue());
-  }
-
-  if(peek().getType() == Token::Type::END_OF_LINE) {
-    return lhs;
-  }
-
-  std::string op = next().getValue();
-  auto rhs = parseExpression<std::string>();
-  auto expression = std::make_shared<Expression<std::string> >(op, lhs, rhs);
+  std::shared_ptr<Expression<T> > expression = std::make_shared<Expression<T> >(output, memory);
   return expression;
 }
 
@@ -214,6 +213,10 @@ std::shared_ptr<Statement> Parser::parseOutput() {
       else if (typeMap[identifier] == DataType::STRING)
         return parseOutputGeneric<std::string>();
     }
+    case Token::Type::L_PAREN: {
+      next();
+      return parseOutput();
+    }
     default:
       throw std::runtime_error("Unexpected token");
   }
@@ -227,7 +230,7 @@ std::shared_ptr<Statement> Parser::parseAssignment(Token token) {
       auto value = parseExpression<int>();
       expect(Token::Type::END_OF_LINE);
       typeMap[token.getValue()] = DataType::INT;
-      return std::make_shared<Assignment<int> >(memory, token.getValue(), value);;
+      return std::make_shared<Assignment<int> >(memory, token.getValue(), value);
     }
     case Token::Type::STRING: {
       auto value = parseExpression<std::string>();

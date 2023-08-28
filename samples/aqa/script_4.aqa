@@ -1,0 +1,9 @@
+# Respect order of operations
+OUTPUT 3 + 2 * 4
+OUTPUT (3 + 2) * 4
+OUTPUT 16 / 2 * 4
+OUTPUT 16 / (2 * 4)
+a <- 4
+b <- 2
+c <- 3
+OUTPUT a * b + c
