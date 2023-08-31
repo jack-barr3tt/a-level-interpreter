@@ -67,3 +67,23 @@ DataType Memory::getType(const std::string& identifier) {
 
   return this->data[key].type;
 }
+
+bool Memory::getBool(const std::string &identifier) {
+  int key = getKey(identifier);
+
+  Data data = this->data[key];
+
+  if(data.type != BOOL) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  return data.data[0] == 1;
+}
+
+void Memory::add(const std::string &identifier, bool value, bool constant) {
+  int key = getKey(identifier);
+
+  Data data(BOOL, constant, {value ? 1 : 0});
+
+  this->data[key] = data;
+}

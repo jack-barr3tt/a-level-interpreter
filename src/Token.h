@@ -15,6 +15,10 @@ public:
   enum Type {
     COMMENT,
     NUMBER,
+    BOOLEAN,
+    OR,
+    AND,
+    NOT,
     PLUS,
     MINUS,
     MULTIPLY,

@@ -95,3 +95,47 @@ template<> std::string Expression<std::string>::evaluate() {
 
   return values.top();
 }
+
+template<> bool Expression<bool>::evaluate() {
+  stack<bool> values;
+
+  while(!tokens->empty()) {
+    Token token = tokens->front();
+    tokens->pop();
+
+    if (token.getType() == Token::Type::BOOLEAN) {
+      values.push(token.getValue() == "True");
+    } else if (token.getType() == Token::Type::IDENTIFIER) {
+      values.push(memory->getBool(token.getValue()));
+    } else {
+      switch (token.getType()) {
+        case Token::Type::AND: {
+          bool rhs = values.top();
+          values.pop();
+          bool lhs = values.top();
+          values.pop();
+          values.push(lhs && rhs);
+          break;
+        }
+        case Token::Type::OR: {
+          bool rhs = values.top();
+          values.pop();
+          bool lhs = values.top();
+          values.pop();
+          values.push(lhs || rhs);
+          break;
+        }
+        case Token::Type::NOT: {
+          bool top = values.top();
+          values.pop();
+          values.push(!top);
+          break;
+        }
+        default:
+          throw std::runtime_error("Unexpected token");
+      }
+    }
+  }
+
+  return values.top();
+}

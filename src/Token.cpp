@@ -23,6 +23,14 @@ std::string Token::pattern() {
       return "\\d+\\b";
     case Token::STRING:
       return "\"([^\"]*)\"";
+    case Token::BOOLEAN:
+      return "True|False";
+    case Token::AND:
+      return "AND\\b";
+    case Token::OR:
+      return "OR\\b";
+    case Token::NOT:
+      return "NOT\\b";
     case Token::PLUS:
       return "\\+";
     case Token::MINUS:

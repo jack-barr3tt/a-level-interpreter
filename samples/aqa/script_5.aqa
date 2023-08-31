@@ -1,0 +1,10 @@
+# Boolean operations
+a <- False
+b <- False
+c <- True
+OUTPUT a AND b
+OUTPUT a OR b
+OUTPUT a AND b OR c
+OUTPUT a AND (b OR c)
+OUTPUT a OR True AND c
+OUTPUT NOT False AND True

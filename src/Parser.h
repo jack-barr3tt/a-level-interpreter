@@ -93,14 +93,14 @@ public:
 
 template<typename T> std::shared_ptr<Expression<T> > Parser::parseExpression() {
   index--;
-  if(peek().getType() != Token::Type::L_PAREN) index++;
+  if(peek().getType() != Token::Type::L_PAREN && peek().getType() != Token::Type::NOT) index++;
 
-  Token current = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::IDENTIFIER, Token::Type::L_PAREN);
+  Token current = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::BOOLEAN, Token::Type::IDENTIFIER, Token::Type::L_PAREN, Token::Type::NOT);
   std::stack<Token> operators;
   std::shared_ptr<std::queue<Token> > output = std::make_shared<std::queue<Token>>();
 
   while (current.getType() != Token::Type::END_OF_LINE) {
-    if (current.getType() == Token::Type::NUMBER || current.getType() == Token::Type::STRING || current.getType() == Token::Type::IDENTIFIER) {
+    if (current.getType() == Token::Type::NUMBER || current.getType() == Token::Type::STRING || current.getType() == Token::Type::BOOLEAN || current.getType() == Token::Type::IDENTIFIER) {
       output->push(current);
     } else if(current.getType() == Token::Type::L_PAREN) {
       operators.push(current);
@@ -206,14 +206,24 @@ std::shared_ptr<Statement> Parser::parseOutput() {
       return parseOutputGeneric<int>();
     case Token::Type::STRING:
       return parseOutputGeneric<std::string>();
+    case Token::Type::BOOLEAN:
+      return parseOutputGeneric<bool>();
     case Token::Type::IDENTIFIER: {
       std::string identifier = peek().getValue();
       if (typeMap[identifier] == DataType::INT)
         return parseOutputGeneric<int>();
       else if (typeMap[identifier] == DataType::STRING)
         return parseOutputGeneric<std::string>();
+      else if (typeMap[identifier] == DataType::BOOL)
+        return parseOutputGeneric<bool>();
+      else
+        throw std::runtime_error("Unexpected identifier");
     }
     case Token::Type::L_PAREN: {
+      next();
+      return parseOutput();
+    }
+    case Token::Type::NOT: {
       next();
       return parseOutput();
     }
@@ -237,6 +247,12 @@ std::shared_ptr<Statement> Parser::parseAssignment(Token token) {
       expect(Token::Type::END_OF_LINE);
       typeMap[token.getValue()] = DataType::STRING;
       return std::make_shared<Assignment<std::string> >(memory, token.getValue(), value);
+    }
+    case Token::Type::BOOLEAN: {
+      auto value = parseExpression<bool>();
+      expect(Token::Type::END_OF_LINE);
+      typeMap[token.getValue()] = DataType::BOOL;
+      return std::make_shared<Assignment<bool> >(memory, token.getValue(), value);
     }
     default:
       throw std::runtime_error("Unexpected token");

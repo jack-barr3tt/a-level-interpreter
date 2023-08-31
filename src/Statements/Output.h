@@ -16,6 +16,8 @@ private:
    * The expression to be evaluated and outputted
    */
   std::shared_ptr<Expression<T> > outputExpression;
+
+  void write(T data);
 public:
   /*
    * Output a value
@@ -28,13 +30,22 @@ public:
   void execute() override;
 };
 
+template<> void Output<bool>::write(bool data) {
+  std::cout << (data ? "True" : "False") << std::endl;
+}
+
+template<typename T>
+void Output<T>::write(T data) {
+  std::cout << data << std::endl;
+}
+
 template <typename T>
 void Output<T>::execute() {
   if(outputValue.has_value()) {
-    std::cout << outputValue.value() << std::endl;
+    write(outputValue.value());
     return;
   }
-  std::cout << this->outputExpression->evaluate() << std::endl;
+  write(this->outputExpression->evaluate());
 }
 
 template<typename T>

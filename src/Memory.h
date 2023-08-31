@@ -40,6 +40,10 @@ public:
    */
   void add(const std::string& identifier, std::string value, bool constant = false);
   /*
+   * Adds a boolean value to the memory
+   */
+  void add(const std::string& identifier, bool value, bool constant = false);
+  /*
    * Gets an integer value from the memory
    */
   int getInt(const std::string& identifier);
@@ -47,6 +51,10 @@ public:
    * Gets a string value from the memory
    */
   std::string getString(const std::string& identifier);
+  /*
+   * Gets a boolean value from the memory
+   */
+  bool getBool(const std::string& identifier);
   /*
    * Gets the type of a value from the memory
    */
