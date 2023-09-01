@@ -11,16 +11,19 @@ add_executable(ALevelInterpreter src/main.cpp
         src/Token.h
         src/Lexer.cpp
         src/Lexer.h
-        src/Parser.h
         src/Block.cpp
         src/Block.h
         src/Statements/Statement.h
-        src/Statements/Output.h
-        src/Statements/Statement.h
         src/Statements/EmptyStatement.cpp
         src/Statements/EmptyStatement.h
-        src/Expression.h
         src/Memory.cpp
         src/Memory.h
+        src/Statements/Assignment.cpp
         src/Statements/Assignment.h
+        src/Statements/Output.cpp
+        src/Statements/Output.h
+        src/Expression.cpp
+        src/Expression.h
+        src/Parser.cpp
+        src/Parser.h
 )
