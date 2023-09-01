@@ -1,0 +1,11 @@
+# Boolean relations
+a <- "Hello"
+OUTPUT a = "Hello"
+OUTPUT a != "hello"
+OUTPUT 1 + 1 = 2
+OUTPUT 1 + 1 = 5 - 3
+OUTPUT 1 + 1 = 5 - 4
+OUTPUT 1 + 3 > 2
+OUTPUT 1 + 3 >= 4
+OUTPUT 1 + 3 < 4
+OUTPUT 1 + 3 <= 4

@@ -2,14 +2,6 @@
 
 #include <utility>
 
-void Memory::add(const std::string& identifier, int value, bool constant) {
-  int key = getKey(identifier);
-
-  Data data(INT, constant, {value});
-
-  this->data[key] = data;
-}
-
 int Memory::getKey(const std::string& identifier) {
   if(identifiers.find(identifier) == identifiers.end()) {
     int key = identifiers.size();
@@ -50,18 +42,6 @@ std::string Memory::getString(const std::string& identifier) {
   return result;
 }
 
-void Memory::add(const std::string& identifier, std::string value, bool constant) {
-  int key = getKey(identifier);
-
-  Data data(STRING, constant, {});
-
-  for(char i : value) {
-    data.data.push_back(i);
-  }
-
-  this->data[key] = data;
-}
-
 DataType Memory::getType(const std::string& identifier) {
   int key = getKey(identifier);
 
@@ -80,10 +60,14 @@ bool Memory::getBool(const std::string &identifier) {
   return data.data[0] == 1;
 }
 
-void Memory::add(const std::string &identifier, bool value, bool constant) {
+void Memory::add(const std::string &identifier, Data data, bool constant) {
   int key = getKey(identifier);
 
-  Data data(BOOL, constant, {value ? 1 : 0});
-
   this->data[key] = data;
+}
+
+Data Memory::getRaw(const std::string &identifier) {
+  int key = getKey(identifier);
+
+  return this->data[key];
 }

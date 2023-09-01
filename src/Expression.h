@@ -6,56 +6,104 @@
 #include "Memory.h"
 #include "Token.h"
 
-template <typename T>
 class Expression {
 private:
   std::shared_ptr<std::queue<Token>> tokens;
   std::shared_ptr<Memory> memory;
+
+  Data plus(Data lhs, Data rhs);
+  Data minus(Data lhs, Data rhs);
+  Data multiply(Data lhs, Data rhs);
+  Data divide(Data lhs, Data rhs);
+  Data boolOr(Data lhs, Data rhs);
+  Data boolAnd(Data lhs, Data rhs);
+  Data boolNot(Data lhs);
+  Data lessThan(Data lhs, Data rhs);
+  Data greaterThan(Data lhs, Data rhs);
+  Data lessThanOrEqual(Data lhs, Data rhs);
+  Data greaterThanOrEqual(Data lhs, Data rhs);
+  Data notEqual(Data lhs, Data rhs);
+  Data equals(Data lhs, Data rhs);
 public:
   Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory);
-  T evaluate();
+  Data evaluate();
 };
 
-template<typename T>
-Expression<T>::Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory) {
+Expression::Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory) {
   this->tokens = tokens;
   this->memory = memory;
 }
 
-template<typename T>
-T Expression<T>::evaluate() {
-  throw std::runtime_error("Unexpected type");
-}
-
-template<> int Expression<int>::evaluate() {
-  stack<int> values;
+Data Expression::evaluate() {
+  stack<Data> values;
 
   while(!tokens->empty()) {
     Token token = tokens->front();
     tokens->pop();
 
     if (token.getType() == Token::Type::NUMBER) {
-      values.push(stoi(token.getValue()));
+      values.push(Data(INT, false, {stoi(token.getValue())}));
+    } else if (token.getType() == Token::Type::STRING) {
+      values.push(Data(token.getValue(), false));
+    } else if (token.getType() == Token::Type::BOOLEAN) {
+      values.push(Data(token.getValue(), false));
     } else if (token.getType() == Token::Type::IDENTIFIER) {
-      values.push(memory->getInt(token.getValue()));
+      values.push(memory->getRaw(token.getValue()));
     } else {
-      int rhs = values.top();
+      if(token.getType() == Token::Type::NOT) {
+        // Not is a special case because it only needs one operand
+        Data lhs = values.top();
+        values.pop();
+        values.push(boolNot(lhs));
+        continue;
+      }
+
+      if(values.size() < 2) {
+        throw std::runtime_error("Missing operand");
+      }
+
+      Data rhs = values.top();
       values.pop();
-      int lhs = values.top();
+      Data lhs = values.top();
       values.pop();
 
       switch (token.getType()) {
-        case Token::Type::PLUS:
-          values.push(lhs + rhs);
+        case Token::Type::PLUS: {
+          values.push(plus(lhs, rhs));
           break;
+        }
         case Token::Type::MINUS:
-          values.push(lhs - rhs);
+          values.push(minus(lhs, rhs));
           break;
         case Token::Type::MULTIPLY:
-          values.push(lhs * rhs);
+          values.push(multiply(lhs, rhs));
           break;
         case Token::Type::DIVIDE:
-          values.push(lhs / rhs);
+          values.push(divide(lhs, rhs));
+          break;
+        case Token::Type::OR:
+          values.push(boolOr(lhs, rhs));
+          break;
+        case Token::Type::AND:
+          values.push(boolAnd(lhs, rhs));
+          break;
+        case Token::Type::EQUALS:
+          values.push(equals(lhs, rhs));
+          break;
+        case Token::Type::LESS_THAN:
+          values.push(lessThan(lhs, rhs));
+          break;
+        case Token::Type::GREATER_THAN:
+          values.push(greaterThan(lhs, rhs));
+          break;
+        case Token::Type::LESS_THAN_OR_EQUAL:
+          values.push(lessThanOrEqual(lhs, rhs));
+          break;
+        case Token::Type::GREATER_THAN_OR_EQUAL:
+          values.push(greaterThanOrEqual(lhs, rhs));
+          break;
+        case Token::Type::NOT_EQUALS:
+          values.push(notEqual(lhs, rhs));
           break;
         default:
           throw std::runtime_error("Unexpected token");
@@ -66,76 +114,166 @@ template<> int Expression<int>::evaluate() {
   return values.top();
 }
 
-template<> std::string Expression<std::string>::evaluate() {
-  stack<std::string> values;
-
-  while(!tokens->empty()) {
-    Token token = tokens->front();
-    tokens->pop();
-
-    if (token.getType() == Token::Type::STRING) {
-      values.push(token.getValue());
-    } else if (token.getType() == Token::Type::IDENTIFIER) {
-      values.push(memory->getString(token.getValue()));
-    } else {
-      std::string rhs = values.top();
-      values.pop();
-      std::string lhs = values.top();
-      values.pop();
-
-      switch (token.getType()) {
-        case Token::Type::PLUS:
-          values.push(lhs + rhs);
-          break;
-        default:
-          throw std::runtime_error("Unexpected token");
-      }
-    }
+Data Expression::plus(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
   }
 
-  return values.top();
+  switch (lhs.type) {
+    case INT:
+      return Data(INT, false, {lhs.data[0] + rhs.data[0]});
+    case STRING: {
+      std::vector<int> result = lhs.data;
+      for(int i : rhs.data) {
+        result.push_back(i);
+      }
+      return Data(STRING, false, result);
+    }
+    default:
+      throw std::runtime_error("Missing overload");
+  }
 }
 
-template<> bool Expression<bool>::evaluate() {
-  stack<bool> values;
-
-  while(!tokens->empty()) {
-    Token token = tokens->front();
-    tokens->pop();
-
-    if (token.getType() == Token::Type::BOOLEAN) {
-      values.push(token.getValue() == "True");
-    } else if (token.getType() == Token::Type::IDENTIFIER) {
-      values.push(memory->getBool(token.getValue()));
-    } else {
-      switch (token.getType()) {
-        case Token::Type::AND: {
-          bool rhs = values.top();
-          values.pop();
-          bool lhs = values.top();
-          values.pop();
-          values.push(lhs && rhs);
-          break;
-        }
-        case Token::Type::OR: {
-          bool rhs = values.top();
-          values.pop();
-          bool lhs = values.top();
-          values.pop();
-          values.push(lhs || rhs);
-          break;
-        }
-        case Token::Type::NOT: {
-          bool top = values.top();
-          values.pop();
-          values.push(!top);
-          break;
-        }
-        default:
-          throw std::runtime_error("Unexpected token");
-      }
-    }
+Data Expression::minus(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
   }
 
-  return values.top();
+  switch (lhs.type) {
+    case INT:
+      return Data(INT, false, {lhs.data[0] - rhs.data[0]});
+    default:
+      throw std::runtime_error("Missing overload");
+  }
 }
+
+Data Expression::multiply(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  switch (lhs.type) {
+    case INT:
+      return Data(INT, false, {lhs.data[0] * rhs.data[0]});
+    default:
+      throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::divide(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  switch (lhs.type) {
+    case INT:
+      return Data(INT, false, {lhs.data[0] / rhs.data[0]});
+    default:
+      throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::boolOr(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  switch (lhs.type) {
+    case BOOL:
+      return Data(BOOL, false, {lhs.data[0] || rhs.data[0]});
+    default:
+      throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::boolAnd(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  switch (lhs.type) {
+    case BOOL:
+      return Data(BOOL, false, {lhs.data[0] && rhs.data[0]});
+    default:
+      throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::boolNot(Data lhs) {
+  switch (lhs.type) {
+    case BOOL:
+      return Data(BOOL, false, {!lhs.data[0]});
+    default:
+      throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::equals(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  if(lhs.type == BOOL || lhs.type == INT) {
+    return Data(BOOL, false, {lhs.data[0] == rhs.data[0]});
+  } else if(lhs.type == STRING) {
+    return Data(BOOL, false, {lhs.data == rhs.data});
+  } else {
+    throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::lessThan(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  if(lhs.type == INT) {
+    return Data(BOOL, false, {lhs.data[0] < rhs.data[0]});
+  } else {
+    throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::greaterThan(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  if(lhs.type == INT) {
+    return Data(BOOL, false, {lhs.data[0] > rhs.data[0]});
+  } else {
+    throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::lessThanOrEqual(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  if(lhs.type == INT) {
+    return Data(BOOL, false, {lhs.data[0] <= rhs.data[0]});
+  } else {
+    throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::greaterThanOrEqual(Data lhs, Data rhs) {
+  if(lhs.type != rhs.type) {
+    throw std::runtime_error("Type mismatch");
+  }
+
+  if(lhs.type == INT) {
+    return Data(BOOL, false, {lhs.data[0] >= rhs.data[0]});
+  } else {
+    throw std::runtime_error("Missing overload");
+  }
+}
+
+Data Expression::notEqual(Data lhs, Data rhs) {
+  auto result = equals(lhs, rhs);
+  result.data[0] = !result.data[0];
+  return result;
+}
+
+

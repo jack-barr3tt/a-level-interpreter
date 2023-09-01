@@ -25,6 +25,18 @@ std::string Token::pattern() {
       return "\"([^\"]*)\"";
     case Token::BOOLEAN:
       return "True|False";
+    case Token::LESS_THAN:
+      return "<";
+    case Token::GREATER_THAN:
+      return ">";
+    case Token::EQUALS:
+      return "=";
+    case Token::NOT_EQUALS:
+      return "!=";
+    case Token::LESS_THAN_OR_EQUAL:
+      return "<=";
+    case Token::GREATER_THAN_OR_EQUAL:
+      return ">=";
     case Token::AND:
       return "AND\\b";
     case Token::OR:

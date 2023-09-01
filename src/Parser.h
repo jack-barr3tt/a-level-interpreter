@@ -41,15 +41,18 @@ private:
    * See the next token without consuming it
    */
   Token peek();
+
   /*
    * See the next token
    */
   Token next();
+
   /*
    * If this overload is called, the expected token has not been found
    * and an error is thrown
    */
   static Token expect();
+
   template<typename... Args>
   /*
    * Get the next token provided it matches one of the expected types
@@ -60,30 +63,32 @@ private:
    * Parse a series of tokens enclosed in a block
    */
   std::shared_ptr<Block> parseBlock();
+
   /*
    * Parse the tokens that make up a statement
    */
   std::shared_ptr<Statement> parseStatement();
 
-  template<typename T>
-  std::shared_ptr<Output<T> > parseOutputGeneric();
   /*
    * Parse the tokens that make up an output statement
    */
-  std::shared_ptr<Statement> parseOutput();
+  std::shared_ptr<Output> parseOutput();
+
   /*
    * Parse tokens in a statement that begin with an identifier
    */
   std::shared_ptr<Statement> parseIdentifier(Token token);
+
   /*
    * Parse the tokens that make up an assignment statement
    */
   std::shared_ptr<Statement> parseAssignment(Token token);
+
   /*
    * Parse the tokens that make up an expression
    */
-  template<typename T>
-  std::shared_ptr<Expression<T> > parseExpression();
+  std::shared_ptr<Expression> parseExpression();
+
 public:
   /*
    * Parse a series of tokens
@@ -91,27 +96,30 @@ public:
   static std::shared_ptr<Block> parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory);
 };
 
-template<typename T> std::shared_ptr<Expression<T> > Parser::parseExpression() {
+std::shared_ptr<Expression> Parser::parseExpression() {
   index--;
-  if(peek().getType() != Token::Type::L_PAREN && peek().getType() != Token::Type::NOT) index++;
+  if (peek().getType() != Token::Type::L_PAREN && peek().getType() != Token::Type::NOT) index++;
 
-  Token current = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::BOOLEAN, Token::Type::IDENTIFIER, Token::Type::L_PAREN, Token::Type::NOT);
+  Token current = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::BOOLEAN, Token::Type::IDENTIFIER,
+                         Token::Type::L_PAREN, Token::Type::NOT);
   std::stack<Token> operators;
   std::shared_ptr<std::queue<Token> > output = std::make_shared<std::queue<Token>>();
 
   while (current.getType() != Token::Type::END_OF_LINE) {
-    if (current.getType() == Token::Type::NUMBER || current.getType() == Token::Type::STRING || current.getType() == Token::Type::BOOLEAN || current.getType() == Token::Type::IDENTIFIER) {
+    if (current.getType() == Token::Type::NUMBER || current.getType() == Token::Type::STRING ||
+        current.getType() == Token::Type::BOOLEAN || current.getType() == Token::Type::IDENTIFIER) {
       output->push(current);
-    } else if(current.getType() == Token::Type::L_PAREN) {
+    } else if (current.getType() == Token::Type::L_PAREN) {
       operators.push(current);
-    } else if(current.getType() == Token::Type::R_PAREN) {
-      while(!operators.empty() && operators.top().getType() != Token::Type::L_PAREN) {
+    } else if (current.getType() == Token::Type::R_PAREN) {
+      while (!operators.empty() && operators.top().getType() != Token::Type::L_PAREN) {
         output->push(operators.top());
         operators.pop();
       }
       operators.pop();
     } else {
-      while(!operators.empty() && current.getType() <= operators.top().getType() && operators.top().getType() != Token::Type::L_PAREN) {
+      while (!operators.empty() && current.getType() <= operators.top().getType() &&
+             operators.top().getType() != Token::Type::L_PAREN) {
         output->push(operators.top());
         operators.pop();
       }
@@ -120,22 +128,15 @@ template<typename T> std::shared_ptr<Expression<T> > Parser::parseExpression() {
     current = next();
   }
 
-  while(!operators.empty()) {
+  while (!operators.empty()) {
     output->push(operators.top());
     operators.pop();
   }
 
   index--;
 
-  std::shared_ptr<Expression<T> > expression = std::make_shared<Expression<T> >(output, memory);
+  std::shared_ptr<Expression> expression = std::make_shared<Expression>(output, memory);
   return expression;
-}
-
-template <typename T>
-std::shared_ptr<Output<T> > Parser::parseOutputGeneric() {
-  auto value = parseExpression<T>();
-  expect(Token::Type::END_OF_LINE);
-  return std::make_shared<Output<T> >(value);
 }
 
 std::shared_ptr<Block> Parser::parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
@@ -158,11 +159,11 @@ Token Parser::next() {
 
 template<typename... Args>
 Token Parser::expect(Token::Type type, Args... args) {
-  if(index >= tokens.size()) {
+  if (index >= tokens.size()) {
     throw std::runtime_error("No more tokens");
   }
 
-  if(peek().getType() == type) {
+  if (peek().getType() == type) {
     return next();
   }
 
@@ -172,9 +173,9 @@ Token Parser::expect(Token::Type type, Args... args) {
 std::shared_ptr<Block> Parser::parseBlock() {
   std::vector<std::shared_ptr<Statement> > statements;
 
-  while(peek().getType() != Token::Type::END_OF_BLOCK) {
+  while (peek().getType() != Token::Type::END_OF_BLOCK) {
     auto statement = parseStatement();
-    if(!dynamic_cast<EmptyStatement*>(statement.get()))
+    if (!dynamic_cast<EmptyStatement *>(statement.get()))
       statements.push_back(statement);
   }
 
@@ -200,67 +201,29 @@ std::shared_ptr<Statement> Parser::parseStatement() {
   }
 }
 
-std::shared_ptr<Statement> Parser::parseOutput() {
-  switch(peek().getType()) {
-    case Token::Type::NUMBER:
-      return parseOutputGeneric<int>();
-    case Token::Type::STRING:
-      return parseOutputGeneric<std::string>();
-    case Token::Type::BOOLEAN:
-      return parseOutputGeneric<bool>();
-    case Token::Type::IDENTIFIER: {
-      std::string identifier = peek().getValue();
-      if (typeMap[identifier] == DataType::INT)
-        return parseOutputGeneric<int>();
-      else if (typeMap[identifier] == DataType::STRING)
-        return parseOutputGeneric<std::string>();
-      else if (typeMap[identifier] == DataType::BOOL)
-        return parseOutputGeneric<bool>();
-      else
-        throw std::runtime_error("Unexpected identifier");
-    }
-    case Token::Type::L_PAREN: {
-      next();
-      return parseOutput();
-    }
-    case Token::Type::NOT: {
-      next();
-      return parseOutput();
-    }
-    default:
-      throw std::runtime_error("Unexpected token");
-  }
+std::shared_ptr<Output> Parser::parseOutput() {
+
+  if (peek().getType() == Token::Type::L_PAREN || peek().getType() == Token::Type::NOT) index++;
+
+  auto value = parseExpression();
+  expect(Token::Type::END_OF_LINE);
+  return std::make_shared<Output>(value);
+
 }
 
 std::shared_ptr<Statement> Parser::parseAssignment(Token token) {
   index++;
 
-  switch (peek().getType()) {
-    case Token::Type::NUMBER: {
-      auto value = parseExpression<int>();
-      expect(Token::Type::END_OF_LINE);
-      typeMap[token.getValue()] = DataType::INT;
-      return std::make_shared<Assignment<int> >(memory, token.getValue(), value);
-    }
-    case Token::Type::STRING: {
-      auto value = parseExpression<std::string>();
-      expect(Token::Type::END_OF_LINE);
-      typeMap[token.getValue()] = DataType::STRING;
-      return std::make_shared<Assignment<std::string> >(memory, token.getValue(), value);
-    }
-    case Token::Type::BOOLEAN: {
-      auto value = parseExpression<bool>();
-      expect(Token::Type::END_OF_LINE);
-      typeMap[token.getValue()] = DataType::BOOL;
-      return std::make_shared<Assignment<bool> >(memory, token.getValue(), value);
-    }
-    default:
-      throw std::runtime_error("Unexpected token");
-  }
+
+  auto value = parseExpression();
+  expect(Token::Type::END_OF_LINE);
+  typeMap[token.getValue()] = DataType::INT;
+  return std::make_shared<Assignment>(memory, token.getValue(), value);
+
 }
 
 std::shared_ptr<Statement> Parser::parseIdentifier(Token token) {
-  switch(peek().getType()) {
+  switch (peek().getType()) {
     case Token::Type::ASSIGNMENT:
       return parseAssignment(token);
     default:
