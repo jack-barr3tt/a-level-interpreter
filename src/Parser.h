@@ -13,6 +13,11 @@
 #include "Statements/EmptyStatement.h"
 #include "Statements/Assignment.h"
 
+struct ParseBlockResult {
+  std::shared_ptr<Block> block;
+  Token::Type matched;
+};
+
 /*
  * Abstract Syntax Tree:
  * <block> ::= <statements>
@@ -20,8 +25,8 @@
  * <statement> ::= <output> <end-of-line>
  * <output> ::= OUTPUT <value>
  * <value> ::= <integer> | <expression>
- * <expression> ::= <value> <operator> <value>
- * <operator> ::= + | - | * | /
+ * <expression> ::= <expression> <operator> <expression> | <value>
+ * <operator> ::= + | - | * | / | OR | AND | < | > | <= | >= | == | !=
  */
 
 /*
@@ -59,7 +64,7 @@ private:
   /*
    * Parse a series of tokens enclosed in a block
    */
-  std::shared_ptr<Block> parseBlock();
+  ParseBlockResult parseBlock(std::vector<Token::Type> targets = { Token::END_OF_BLOCK });
 
   /*
    * Parse the tokens that make up a statement
@@ -70,6 +75,21 @@ private:
    * Parse the tokens that make up an output statement
    */
   std::shared_ptr<Output> parseOutput();
+
+  /*
+   * Parse the tokens that make up an if statement
+   */
+  std::shared_ptr<Statement> parseIf();
+
+  /*
+   * Parse the tokens that make up a while statement
+   */
+  std::shared_ptr<Statement> parseWhile();
+
+  /*
+   * Parse the tokens that make up a repeat statement
+   */
+  std::shared_ptr<Statement> parseRepeat();
 
   /*
    * Parse tokens in a statement that begin with an identifier
@@ -84,7 +104,7 @@ private:
   /*
    * Parse the tokens that make up an expression
    */
-  std::shared_ptr<Expression> parseExpression();
+  std::shared_ptr<Expression> parseExpression(Token::Type target = Token::Type::END_OF_LINE);
 
 public:
   /*

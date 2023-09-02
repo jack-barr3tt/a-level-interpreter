@@ -1,16 +1,17 @@
 #include "Expression.h"
 
 Expression::Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory) {
-  this->tokens = tokens;
+  this->storedTokens = tokens;
   this->memory = memory;
 }
 
 Data Expression::evaluate() {
   std::stack<Data> values;
+  std::queue<Token> tokens(*storedTokens);
 
-  while(!tokens->empty()) {
-    Token token = tokens->front();
-    tokens->pop();
+  while(!tokens.empty()) {
+    Token token = tokens.front();
+    tokens.pop();
 
     if (token.getType() == Token::Type::NUMBER) {
       values.push(Data(INT, false, {stoi(token.getValue())}));

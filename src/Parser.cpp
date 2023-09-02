@@ -1,15 +1,15 @@
 #include "Parser.h"
+#include "Statements/If.h"
+#include "Statements/While.h"
+#include "Statements/Repeat.h"
 
-std::shared_ptr<Expression> Parser::parseExpression() {
-  index--;
-  if (peek().getType() != Token::Type::L_PAREN && peek().getType() != Token::Type::NOT) index++;
-
+std::shared_ptr<Expression> Parser::parseExpression(Token::Type target) {
   Token current = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::BOOLEAN, Token::Type::IDENTIFIER,
                          Token::Type::L_PAREN, Token::Type::NOT);
   std::stack<Token> operators;
   std::shared_ptr<std::queue<Token> > output = std::make_shared<std::queue<Token>>();
 
-  while (current.getType() != Token::Type::END_OF_LINE) {
+  while (current.getType() != target) {
     if (current.getType() == Token::Type::NUMBER || current.getType() == Token::Type::STRING ||
         current.getType() == Token::Type::BOOLEAN || current.getType() == Token::Type::IDENTIFIER) {
       output->push(current);
@@ -45,7 +45,7 @@ std::shared_ptr<Expression> Parser::parseExpression() {
 
 std::shared_ptr<Block> Parser::parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
   Parser parser(std::move(tokens), std::move(memory));
-  return parser.parseBlock();
+  return parser.parseBlock().block;
 }
 
 Parser::Parser(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
@@ -74,17 +74,21 @@ Token Parser::expect(Token::Type type, Args... args) {
   return expect(args...);
 }
 
-std::shared_ptr<Block> Parser::parseBlock() {
+ParseBlockResult Parser::parseBlock(std::vector<Token::Type> targets) {
+  if (targets.empty()) {
+    throw std::runtime_error("No targets provided");
+  }
+
   std::vector<std::shared_ptr<Statement> > statements;
 
-  while (peek().getType() != Token::Type::END_OF_BLOCK) {
+  while (std::find(targets.begin(), targets.end(), peek().getType()) == targets.end()) {
     auto statement = parseStatement();
     if (!dynamic_cast<EmptyStatement *>(statement.get()))
       statements.push_back(statement);
   }
 
-  auto block = std::make_shared<Block>(memory, statements);
-  return block;
+  std::shared_ptr<Block> block = std::make_shared<Block>(memory, statements);
+  return {block, peek().getType()};
 }
 
 std::shared_ptr<Statement> Parser::parseStatement() {
@@ -96,6 +100,12 @@ std::shared_ptr<Statement> Parser::parseStatement() {
       return std::make_shared<EmptyStatement>();
     case Token::Type::OUTPUT:
       return parseOutput();
+    case Token::Type::IF:
+      return parseIf();
+    case Token::Type::WHILE:
+      return parseWhile();
+    case Token::Type::REPEAT:
+      return parseRepeat();
     case Token::Type::IDENTIFIER: {
       auto identifier = parseIdentifier(token);
       return identifier;
@@ -106,9 +116,6 @@ std::shared_ptr<Statement> Parser::parseStatement() {
 }
 
 std::shared_ptr<Output> Parser::parseOutput() {
-
-  if (peek().getType() == Token::Type::L_PAREN || peek().getType() == Token::Type::NOT) index++;
-
   auto value = parseExpression();
   expect(Token::Type::END_OF_LINE);
   return std::make_shared<Output>(value);
@@ -133,4 +140,41 @@ std::shared_ptr<Statement> Parser::parseIdentifier(Token token) {
 
 Token Parser::expect() {
   throw std::runtime_error("Unexpected token");
+}
+
+std::shared_ptr<Statement> Parser::parseIf() {
+  auto condition = parseExpression(Token::Type::THEN);
+  expect(Token::Type::THEN);
+  expect(Token::Type::END_OF_LINE);
+  auto result1 = parseBlock({Token::Type::ENDIF, Token::Type::ELSE});
+  if(result1.matched == Token::Type::ELSE) {
+    expect(Token::Type::ELSE);
+    expect(Token::Type::END_OF_LINE);
+    auto result2 = parseBlock({Token::Type::ENDIF});
+    expect(Token::Type::ENDIF);
+    expect(Token::Type::END_OF_LINE);
+    return std::make_shared<If>(condition, result1.block, result2.block);
+  } else {
+    expect(Token::Type::ENDIF);
+    expect(Token::Type::END_OF_LINE);
+    return std::make_shared<If>(condition, result1.block, nullptr);
+  }
+}
+
+std::shared_ptr<Statement> Parser::parseWhile() {
+  auto condition = parseExpression();
+  expect(Token::Type::END_OF_LINE);
+  auto result = parseBlock({Token::Type::ENDWHILE});
+  expect(Token::Type::ENDWHILE);
+  expect(Token::Type::END_OF_LINE);
+  return std::make_shared<While>(condition, result.block);
+}
+
+std::shared_ptr<Statement> Parser::parseRepeat() {
+  expect(Token::Type::END_OF_LINE);
+  auto result = parseBlock({Token::Type::UNTIL});
+  expect(Token::Type::UNTIL);
+  auto condition = parseExpression();
+  expect(Token::Type::END_OF_LINE);
+  return std::make_shared<Repeat>(condition, result.block);
 }

@@ -57,6 +57,22 @@ std::string Token::pattern() {
       return "\\(";
     case Token::OUTPUT:
       return "OUTPUT\\b";
+    case Token::IF:
+      return "IF\\b";
+    case Token::THEN:
+      return "THEN\\b";
+    case Token::ELSE:
+      return "ELSE\\b";
+    case Token::ENDIF:
+      return "ENDIF\\b";
+    case Token::WHILE:
+      return "WHILE\\b";
+    case Token::ENDWHILE:
+      return "ENDWHILE\\b";
+    case Token::REPEAT:
+      return "REPEAT\\b";
+    case Token::UNTIL:
+      return "UNTIL\\b";
     case Token::ASSIGNMENT:
       return "<-";
     case Token::IDENTIFIER:

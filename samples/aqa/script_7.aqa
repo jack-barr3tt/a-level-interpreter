@@ -1,0 +1,18 @@
+# Selection and indefinite iteration statements
+a <- 1
+WHILE a < 20
+  IF a > 5 THEN
+    IF a > 10 THEN
+      OUTPUT "a is greater than 10"
+    ELSE
+      OUTPUT "a is greater than 5 but less than or equal to 10"
+    ENDIF
+  ELSE
+    OUTPUT "a is less than or equal to 5"
+  ENDIF
+  a <- a + 1
+ENDWHILE
+REPEAT
+    OUTPUT a
+    a <- a - 1
+UNTIL a = 0

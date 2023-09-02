@@ -26,4 +26,10 @@ add_executable(ALevelInterpreter src/main.cpp
         src/Expression.h
         src/Parser.cpp
         src/Parser.h
+        src/Statements/If.cpp
+        src/Statements/If.h
+        src/Statements/While.cpp
+        src/Statements/While.h
+        src/Statements/Repeat.cpp
+        src/Statements/Repeat.h
 )

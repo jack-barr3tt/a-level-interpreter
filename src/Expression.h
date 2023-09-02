@@ -9,7 +9,7 @@
 
 class Expression {
 private:
-  std::shared_ptr<std::queue<Token>> tokens;
+  std::shared_ptr<std::queue<Token>> storedTokens;
   std::shared_ptr<Memory> memory;
 
   Data plus(Data lhs, Data rhs);
