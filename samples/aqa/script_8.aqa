@@ -1,0 +1,8 @@
+b <- 1
+IF True THEN
+    a <- "Hello"
+    OUTPUT a + " inside the if"
+    b <- b + 1
+ENDIF
+OUTPUT b
+OUTPUT a + " outside the if"

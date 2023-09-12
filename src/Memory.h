@@ -47,31 +47,27 @@ class Memory {
 public:
   void add(const std::string& identifier, Data data, bool constant = false);
   /*
-   * Gets an integer value from the memory
-   */
-  int getInt(const std::string& identifier);
-  /*
-   * Gets a string value from the memory
-   */
-  std::string getString(const std::string& identifier);
-  /*
-   * Gets a boolean value from the memory
-   */
-  bool getBool(const std::string& identifier);
-  /*
-   * Gets the type of a value from the memory
-   */
-  DataType getType(const std::string& identifier);
-  /*
    * Gets the raw data from the memory
    */
-  Data getRaw(const std::string& identifier);
+  Data get(const std::string& identifier);
+  /*
+   * Checks if this memory has the given identifier
+   */
+  bool has(const std::string& identifier);
+  /*
+   * Pushes a new scope onto the memory
+   */
+  void push();
+  /*
+   * Pops the current scope off the memory
+   */
+  void pop();
 private:
-  std::unordered_map<std::string, int> identifiers;
-  std::unordered_map<int, Data> data;
+  std::vector<std::unordered_map<std::string, int> > identifiers;
+  std::vector<std::unordered_map<int, Data> > data;
 
   /*
    * Gets the key associated with an identifier
    */
-  int getKey(const std::string& identifier);
+  std::vector<int> getKey(const std::string& identifier, bool create = false);
 };

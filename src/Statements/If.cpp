@@ -6,15 +6,15 @@ If::If(std::shared_ptr<Expression> condition, std::shared_ptr<Block> ifBody, std
     this->elseBody = std::move(elseBody);
 }
 
-void If::execute() {
-  Data conditionValue = condition->evaluate();
+void If::execute(std::shared_ptr<Memory> memory) {
+  Data conditionValue = condition->evaluate(memory);
   if(conditionValue.type != DataType::BOOL) {
     throw std::runtime_error("If condition must be a boolean");
   }
 
   if(conditionValue.data[0] == 1) {
-    ifBody->execute();
+    ifBody->execute(memory);
   } else if(elseBody != nullptr) {
-    elseBody->execute();
+    elseBody->execute(memory);
   }
 }

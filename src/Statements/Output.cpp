@@ -21,12 +21,12 @@ void Output::write(Data data) {
   }
 }
 
-void Output::execute() {
+void Output::execute(std::shared_ptr<Memory> memory) {
   if (outputValue.has_value()) {
     write(outputValue.value());
     return;
   }
-  write(this->outputExpression->evaluate());
+  write(this->outputExpression->evaluate(memory));
 }
 
 Output::Output(std::shared_ptr<Expression> outputExpression) {

@@ -6,10 +6,9 @@
 
 class Assignment : public Statement {
 private:
-  std::shared_ptr<Memory> memory;
   std::string identifier;
   std::shared_ptr<Expression> expression;
 public:
-  Assignment(std::shared_ptr<Memory> memory, std::string identifier, std::shared_ptr<Expression> expression);
-  void execute() override;
+  Assignment(std::string identifier, std::shared_ptr<Expression> expression);
+  void execute(std::shared_ptr<Memory> memory) override;
 };

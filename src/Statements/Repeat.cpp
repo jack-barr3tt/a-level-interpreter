@@ -5,11 +5,11 @@ Repeat::Repeat(std::shared_ptr<Expression> condition, std::shared_ptr<Block> bod
     this->body = body;
 }
 
-void Repeat::execute() {
+void Repeat::execute(std::shared_ptr<Memory> memory) {
   while(true) {
-    body->execute();
+    body->execute(memory);
 
-    Data conditionValue = condition->evaluate();
+    Data conditionValue = condition->evaluate(memory);
     if(conditionValue.type != DataType::BOOL) {
       throw std::runtime_error("Repeat condition must be a boolean");
     }

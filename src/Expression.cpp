@@ -1,11 +1,10 @@
 #include "Expression.h"
 
-Expression::Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory) {
+Expression::Expression(std::shared_ptr<std::queue<Token> > tokens) {
   this->storedTokens = tokens;
-  this->memory = memory;
 }
 
-Data Expression::evaluate() {
+Data Expression::evaluate(std::shared_ptr<Memory> memory) {
   std::stack<Data> values;
   std::queue<Token> tokens(*storedTokens);
 
@@ -20,7 +19,7 @@ Data Expression::evaluate() {
     } else if (token.getType() == Token::Type::BOOLEAN) {
       values.push(Data(token.getValue(), false));
     } else if (token.getType() == Token::Type::IDENTIFIER) {
-      values.push(memory->getRaw(token.getValue()));
+      values.push(memory->get(token.getValue()));
     } else {
       if(token.getType() == Token::Type::NOT) {
         // Not is a special case because it only needs one operand

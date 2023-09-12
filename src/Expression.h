@@ -10,7 +10,6 @@
 class Expression {
 private:
   std::shared_ptr<std::queue<Token>> storedTokens;
-  std::shared_ptr<Memory> memory;
 
   Data plus(Data lhs, Data rhs);
   Data minus(Data lhs, Data rhs);
@@ -26,8 +25,8 @@ private:
   Data notEqual(Data lhs, Data rhs);
   Data equals(Data lhs, Data rhs);
 public:
-  Expression(std::shared_ptr<std::queue<Token> > tokens, std::shared_ptr<Memory> memory);
-  Data evaluate();
+  Expression(std::shared_ptr<std::queue<Token> > tokens);
+  Data evaluate(std::shared_ptr<Memory> memory);
 };
 
 

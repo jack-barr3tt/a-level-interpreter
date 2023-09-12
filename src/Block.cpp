@@ -2,13 +2,14 @@
 
 #include <utility>
 
-Block::Block(std::shared_ptr<Memory> memory, const std::vector<std::shared_ptr<Statement> > &statements) {
+Block::Block(const std::vector<std::shared_ptr<Statement> > &statements) {
   this->statements = statements;
-  this->memory = std::move(memory);
 }
 
-void Block::execute() {
+void Block::execute(std::shared_ptr<Memory> memory) {
+  memory->push();
   for (const auto& statement : statements) {
-    statement->execute();
+    statement->execute(memory);
   }
+  memory->pop();
 }

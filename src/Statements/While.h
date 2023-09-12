@@ -11,5 +11,5 @@ private:
 public:
     While(std::shared_ptr<Expression> condition, std::shared_ptr<Block> body);
 
-    void execute() override;
+    void execute(std::shared_ptr<Memory> memory) override;
 };

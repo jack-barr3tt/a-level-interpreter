@@ -1,73 +1,44 @@
 #include "Memory.h"
 
-#include <utility>
-
-int Memory::getKey(const std::string& identifier) {
-  if(identifiers.find(identifier) == identifiers.end()) {
-    int key = identifiers.size();
-    identifiers[identifier] = key;
-    return key;
-  } else {
-    return identifiers[identifier];
+std::vector<int> Memory::getKey(const std::string &identifier, bool create) {
+  for (int i = 0; i < identifiers.size(); i++) {
+    if (identifiers[i].find(identifier) != identifiers[i].end()) {
+      return {i, identifiers[i][identifier]};
+    }
   }
-}
-
-int Memory::getInt(const std::string& identifier) {
-  int key = getKey(identifier);
-
-  Data data = this->data[key];
-
-  if(data.type != INT) {
-    throw std::runtime_error("Type mismatch");
+  if(!create) {
+    throw std::runtime_error(identifier + " is undefined");
   }
-
-  return data.data[0];
-}
-
-std::string Memory::getString(const std::string& identifier) {
-  int key = getKey(identifier);
-
-  Data data = this->data[key];
-
-  if(data.type != STRING) {
-    throw std::runtime_error("Type mismatch");
-  }
-
-  std::string result;
-
-  for(int i : data.data) {
-    result += (char)i;
-  }
-
-  return result;
-}
-
-DataType Memory::getType(const std::string& identifier) {
-  int key = getKey(identifier);
-
-  return this->data[key].type;
-}
-
-bool Memory::getBool(const std::string &identifier) {
-  int key = getKey(identifier);
-
-  Data data = this->data[key];
-
-  if(data.type != BOOL) {
-    throw std::runtime_error("Type mismatch");
-  }
-
-  return data.data[0] == 1;
+  int key = identifiers[identifiers.size() - 1].size();
+  identifiers[identifiers.size() - 1][identifier] = key;
+  return {int(identifiers.size() - 1), key};
 }
 
 void Memory::add(const std::string &identifier, Data data, bool constant) {
-  int key = getKey(identifier);
-
-  this->data[key] = data;
+  std::vector<int> key = getKey(identifier, true);
+  this->data[key[0]][key[1]] = data;
 }
 
-Data Memory::getRaw(const std::string &identifier) {
-  int key = getKey(identifier);
+Data Memory::get(const std::string &identifier) {
+  std::vector<int> key = getKey(identifier);
+  return this->data[key[0]][key[1]];
+}
 
-  return this->data[key];
+bool Memory::has(const std::string &identifier) {
+  for (auto & i : identifiers) {
+    if (i.find(identifier) == i.end()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void Memory::push() {
+  identifiers.emplace_back();
+  data.emplace_back();
+}
+
+void Memory::pop() {
+  identifiers.pop_back();
+  data.pop_back();
 }

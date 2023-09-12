@@ -36,9 +36,8 @@ class Parser {
 private:
   std::vector<Token> tokens;
   int index = 0;
-  std::shared_ptr<Memory> memory;
 
-  Parser(std::vector<Token> tokens, std::shared_ptr<Memory> memory);
+  Parser(std::vector<Token> tokens);
   /*
    * See the next token without consuming it
    */
@@ -110,5 +109,5 @@ public:
   /*
    * Parse a series of tokens
    */
-  static std::shared_ptr<Block> parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory);
+  static std::shared_ptr<Block> parse(std::vector<Token> tokens);
 };

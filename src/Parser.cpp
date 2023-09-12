@@ -39,18 +39,17 @@ std::shared_ptr<Expression> Parser::parseExpression(Token::Type target) {
 
   index--;
 
-  std::shared_ptr<Expression> expression = std::make_shared<Expression>(output, memory);
+  std::shared_ptr<Expression> expression = std::make_shared<Expression>(output);
   return expression;
 }
 
-std::shared_ptr<Block> Parser::parse(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
-  Parser parser(std::move(tokens), std::move(memory));
+std::shared_ptr<Block> Parser::parse(std::vector<Token> tokens) {
+  Parser parser(std::move(tokens));
   return parser.parseBlock().block;
 }
 
-Parser::Parser(std::vector<Token> tokens, std::shared_ptr<Memory> memory) {
+Parser::Parser(std::vector<Token> tokens) {
   this->tokens = std::move(tokens);
-  this->memory = std::move(memory);
 }
 
 Token Parser::peek() {
@@ -87,7 +86,7 @@ ParseBlockResult Parser::parseBlock(std::vector<Token::Type> targets) {
       statements.push_back(statement);
   }
 
-  std::shared_ptr<Block> block = std::make_shared<Block>(memory, statements);
+  std::shared_ptr<Block> block = std::make_shared<Block>(statements);
   return {block, peek().getType()};
 }
 
@@ -126,7 +125,7 @@ std::shared_ptr<Statement> Parser::parseAssignment(Token token) {
   index++;
   auto value = parseExpression();
   expect(Token::Type::END_OF_LINE);
-  return std::make_shared<Assignment>(memory, token.getValue(), value);
+  return std::make_shared<Assignment>(token.getValue(), value);
 }
 
 std::shared_ptr<Statement> Parser::parseIdentifier(Token token) {

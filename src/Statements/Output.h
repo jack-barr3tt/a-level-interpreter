@@ -29,5 +29,5 @@ public:
    */
   explicit Output(std::shared_ptr<Expression> outputExpression);
 
-  void execute() override;
+  void execute(std::shared_ptr<Memory> memory) override;
 };

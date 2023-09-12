@@ -11,5 +11,5 @@ private:
 public:
     If(std::shared_ptr<Expression> condition, std::shared_ptr<Block> ifBody, std::shared_ptr<Block> elseBody = nullptr);
 
-    void execute() override;
+    void execute(std::shared_ptr<Memory> memory) override;
 };

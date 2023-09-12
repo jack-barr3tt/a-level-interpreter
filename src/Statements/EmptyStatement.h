@@ -8,5 +8,5 @@
  */
 class EmptyStatement: public Statement {
 public:
-  void execute() override;
+  void execute(std::shared_ptr<Memory> memory) override;
 };

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stack>
+#include "../Memory.h"
+
 /*
  * Base class for all statements
  */
@@ -8,5 +11,5 @@ class Statement {
     /*
      * Execute the statement
      */
-    virtual void execute() = 0;
+    virtual void execute(std::shared_ptr<Memory> memory) = 0;
 };

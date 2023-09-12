@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
   auto memory = make_shared<Memory>();
 
-  auto block = Parser::parse(tokens, memory);
+  auto block = Parser::parse(tokens);
 
-  block->execute();
+  block->execute(memory);
 }
