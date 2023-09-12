@@ -105,9 +105,12 @@ std::shared_ptr<Statement> Parser::parseStatement() {
       return parseWhile();
     case Token::Type::REPEAT:
       return parseRepeat();
-    case Token::Type::IDENTIFIER: {
-      auto identifier = parseIdentifier(token);
-      return identifier;
+    case Token::Type::IDENTIFIER:
+      return parseIdentifier(token);
+    case Token::Type::CONSTANT: {
+      Token identifier = peek();
+      index--;
+      return parseIdentifier(identifier);
     }
     default:
       throw std::runtime_error("Unhandled token type");
@@ -122,15 +125,19 @@ std::shared_ptr<Output> Parser::parseOutput() {
 }
 
 std::shared_ptr<Statement> Parser::parseAssignment(Token token) {
+  bool constant = peek().getType() == Token::Type::CONSTANT;
   index++;
+  if(constant) index+=2;
   auto value = parseExpression();
   expect(Token::Type::END_OF_LINE);
-  return std::make_shared<Assignment>(token.getValue(), value);
+  return std::make_shared<Assignment>(token.getValue(), value, constant);
 }
 
 std::shared_ptr<Statement> Parser::parseIdentifier(Token token) {
   switch (peek().getType()) {
     case Token::Type::ASSIGNMENT:
+      return parseAssignment(token);
+    case Token::Type::CONSTANT:
       return parseAssignment(token);
     default:
       throw std::runtime_error("Unexpected identifier");

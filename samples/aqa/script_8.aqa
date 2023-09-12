@@ -1,3 +1,4 @@
+# Scoped memory
 b <- 1
 IF True THEN
     a <- "Hello"

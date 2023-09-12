@@ -19,6 +19,8 @@ std::string Token::pattern() {
   switch (this->type) {
     case Token::COMMENT:
       return "^#.*";
+    case Token::CONSTANT:
+      return "CONSTANT\\b";
     case Token::NUMBER:
       return "\\d+\\b";
     case Token::STRING:

@@ -45,7 +45,7 @@ struct Data {
  */
 class Memory {
 public:
-  void add(const std::string& identifier, Data data, bool constant = false);
+  void set(const std::string& identifier, Data data, bool constant = false);
   /*
    * Gets the raw data from the memory
    */

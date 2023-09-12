@@ -15,6 +15,7 @@ public:
   enum Type {
     COMMENT,
     ASSIGNMENT,
+    CONSTANT,
     BOOLEAN,
     NOT_EQUALS,
     LESS_THAN_OR_EQUAL,

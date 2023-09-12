@@ -14,8 +14,10 @@ std::vector<int> Memory::getKey(const std::string &identifier, bool create) {
   return {int(identifiers.size() - 1), key};
 }
 
-void Memory::add(const std::string &identifier, Data data, bool constant) {
+void Memory::set(const std::string &identifier, Data data, bool constant) {
+  if(has(identifier) && get(identifier).constant) throw std::runtime_error("cannot modify constant value " + identifier);
   std::vector<int> key = getKey(identifier, true);
+  data.constant = constant;
   this->data[key[0]][key[1]] = data;
 }
 
@@ -26,7 +28,7 @@ Data Memory::get(const std::string &identifier) {
 
 bool Memory::has(const std::string &identifier) {
   for (auto & i : identifiers) {
-    if (i.find(identifier) == i.end()) {
+    if (i.find(identifier) != i.end()) {
       return true;
     }
   }

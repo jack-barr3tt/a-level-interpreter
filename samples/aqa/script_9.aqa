@@ -1,0 +1,9 @@
+# Constant variables
+CONSTANT a <- 1
+OUTPUT a
+b <- 2
+OUTPUT b
+b <- b + a
+OUTPUT b
+a <- a + b
+OUTPUT a
