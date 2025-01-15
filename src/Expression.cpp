@@ -1,5 +1,8 @@
 #include "Expression.h"
 
+#include <stack>
+#include <stdexcept>
+
 Expression::Expression(std::shared_ptr<std::queue<Token> > tokens) {
   this->storedTokens = tokens;
 }

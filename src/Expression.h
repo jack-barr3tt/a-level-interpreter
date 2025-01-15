@@ -1,9 +1,8 @@
 #pragma once
 
-#include <string>
-#include <utility>
+#include <memory>
 #include <queue>
-#include <stack>
+
 #include "Memory.h"
 #include "Token.h"
 
@@ -25,7 +24,7 @@ private:
   Data notEqual(Data lhs, Data rhs);
   Data equals(Data lhs, Data rhs);
 public:
-  Expression(std::shared_ptr<std::queue<Token> > tokens);
+  explicit Expression(std::shared_ptr<std::queue<Token> > tokens);
   Data evaluate(std::shared_ptr<Memory> memory);
 };
 

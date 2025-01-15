@@ -1,5 +1,7 @@
 #include "While.h"
 
+#include <stdexcept>
+
 While::While(std::shared_ptr<Expression> condition, std::shared_ptr<Block> body) {
     this->condition = condition;
     this->body = body;

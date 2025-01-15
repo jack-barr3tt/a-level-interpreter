@@ -1,5 +1,7 @@
 #include "Memory.h"
 
+#include <stdexcept>
+
 std::vector<int> Memory::getKey(const std::string &identifier, bool create) {
   for (int i = 0; i < identifiers.size(); i++) {
     if (identifiers[i].find(identifier) != identifiers[i].end()) {

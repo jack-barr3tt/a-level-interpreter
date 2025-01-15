@@ -1,5 +1,7 @@
 #include "If.h"
 
+#include <stdexcept>
+
 If::If(std::shared_ptr<Expression> condition, std::shared_ptr<Block> ifBody, std::shared_ptr<Block> elseBody) {
     this->condition = std::move(condition);
     this->ifBody = std::move(ifBody);

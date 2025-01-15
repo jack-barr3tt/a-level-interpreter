@@ -1,5 +1,7 @@
 #include "Output.h"
 
+#include <iostream>
+
 void Output::write(Data data) {
   if (data.type == DataType::BOOL) {
     std::cout << (data.data[0] ? "True" : "False") << std::endl;

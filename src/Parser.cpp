@@ -2,6 +2,7 @@
 #include "Statements/If.h"
 #include "Statements/While.h"
 #include "Statements/Repeat.h"
+#include <algorithm>
 
 std::shared_ptr<Expression> Parser::parseExpression(Token::Type target) {
   Token current = expect(Token::Type::NUMBER, Token::Type::STRING, Token::Type::BOOLEAN, Token::Type::IDENTIFIER,
